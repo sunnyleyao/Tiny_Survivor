@@ -41,7 +41,7 @@ Cheer for me!
 Win condition: collect all seeds and magic before score hits 0.
 """)
 
-# ── sidebar controls ──────────────────────────────────────────────────────────
+# sidebar controls
 st.sidebar.header("Settings")
 
 agent_choice = st.sidebar.radio(
@@ -85,7 +85,7 @@ def load_dqn(variant):
     return load_model(path, obs_dim)
 
 
-# ── draw the grid as an HTML table ───────────────────────────────────────────
+# draw the grid
 import base64
 
 def load_img_base64(path):
