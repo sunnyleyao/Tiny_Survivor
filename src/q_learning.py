@@ -2,7 +2,7 @@
 
 import numpy as np
 import pickle
-from src.hamster_env import HamsterEnv
+from hamster_env import HamsterEnv
 
 EPISODES  = 50000
 LR        = 0.5     # higher LR for faster convergence

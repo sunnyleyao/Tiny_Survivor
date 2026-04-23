@@ -10,7 +10,7 @@ This covers:
   - Real-time ML inference with interactive application (7 pts)
 
 To run:
-  streamlit run app.py
+  streamlit run src/app.py
 """
 
 import streamlit as st
@@ -24,11 +24,13 @@ import os
 import base64
 
 import sys, os
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from src.hamster_env import HamsterEnv, EMPTY, SEED, MAGIC, TAPE, STACK
-from src.q_learning import get_state, get_q_values, MAX_STEPS
-from src.dqn import QNetwork, load_model, device
+from hamster_env import HamsterEnv, EMPTY, SEED, MAGIC, TAPE, STACK
+from q_learning import get_state, get_q_values, MAX_STEPS
+from dqn import QNetwork, load_model, device
+
 
 # ── page config 
 st.set_page_config(
@@ -135,7 +137,7 @@ with st.sidebar:
 #  load models (cached so we don't reload every frame)
 @st.cache_resource
 def load_ql(variant):
-    path = f"q_table_{variant}.pkl"
+    path = os.path.join(ROOT, "models", f"q_table_{variant}.pkl")
     if not os.path.exists(path):
         return None
     with open(path, "rb") as f:
@@ -143,7 +145,7 @@ def load_ql(variant):
 
 @st.cache_resource
 def load_dqn(variant):
-    path = f"dqn_{variant}.pth"
+    path = os.path.join(ROOT, "models", f"dqn_{variant}.pth")
     if not os.path.exists(path):
         return None
     obs_dim = HamsterEnv().observation_space.shape[0]
@@ -159,13 +161,13 @@ def load_img_base64(path):
 
 def draw_grid(grid, hamster_pos):
     CELL_IMG = {
-        EMPTY: load_img_base64("assets/empty.png"),
-        SEED:  load_img_base64("assets/seed.png"),
-        MAGIC: load_img_base64("assets/magic.png"),
-        TAPE:  load_img_base64("assets/tape.png"),
-        STACK: load_img_base64("assets/stack.png"),
+        EMPTY: load_img_base64(os.path.join(ROOT, "assets", "empty.png")),
+        SEED:  load_img_base64(os.path.join(ROOT, "assets", "seed.png")),
+        MAGIC: load_img_base64(os.path.join(ROOT, "assets", "magic.png")),
+        TAPE:  load_img_base64(os.path.join(ROOT, "assets", "tape.png")),
+        STACK: load_img_base64(os.path.join(ROOT, "assets", "stack.png")),
     }
-    HAMSTER_B64 = load_img_base64("assets/hamster.png")
+    HAMSTER_B64 = load_img_base64(os.path.join(ROOT, "assets", "hamster.png"))
 
     def cell_content(cell_type, is_hamster):
         if is_hamster:

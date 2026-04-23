@@ -7,7 +7,7 @@ TORCH_AVAILABLE = True
 
 from collections import deque
 import random
-from src.hamster_env import HamsterEnv
+from hamster_env import HamsterEnv
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu") if TORCH_AVAILABLE else None
 

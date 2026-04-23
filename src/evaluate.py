@@ -5,9 +5,9 @@ import pickle
 import torch
 import os
 
-from src.hamster_env import HamsterEnv, EMPTY, SEED, MAGIC, TAPE, STACK
-from src.q_learning import get_state, get_q_values, MAX_STEPS
-from src.dqn import QNetwork, device, load_model
+from hamster_env import HamsterEnv, EMPTY, SEED, MAGIC, TAPE, STACK
+from q_learning import get_state, get_q_values, MAX_STEPS
+from dqn import QNetwork, device, load_model
 
 def run_episode(agent_type, model_or_table, shaped=False, seed=None):
     env = HamsterEnv(grid_size=5, shaped_reward=shaped)

@@ -4,9 +4,9 @@ import pickle
 import torch
 import os
 
-from src.hamster_env import HamsterEnv
-from src.q_learning import evaluate as ql_evaluate, get_state, get_q_values, MAX_STEPS
-from src.dqn import evaluate as dqn_evaluate, QNetwork, load_model, device
+from hamster_env import HamsterEnv
+from q_learning import evaluate as ql_evaluate, get_state, get_q_values, MAX_STEPS
+from dqn import evaluate as dqn_evaluate, QNetwork, load_model, device
 
 
 # ── helper: smooth a noisy reward curve for plotting ─────────────────────────
