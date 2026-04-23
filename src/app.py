@@ -88,7 +88,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ── header ────────────────────────────────────────────────────────────────────
+# header
 st.title("🐹 Tiny Survivor")
 st.markdown("""
 *Help me! I'm **Toto**, and I'm stuck in this box.*
@@ -269,11 +269,11 @@ def run_episode(agent_type, model_or_table, shaped, seed, delay):
 
     st.divider()
     if info.get("win"):
-        st.success(f"🎉 **Toto wins!**  Final score: {info['score']}  |  Total reward: {total_r:.1f}")
+        st.success(f" **Toto wins!!!!**  Final score: {info['score']}  |  Total reward: {total_r:.1f}")
     elif info.get("lose"):
-        st.error(f"💀 **Toto lost** (score hit 0).  Total reward: {total_r:.1f}")
+        st.error(f" **Toto lost...** Total reward: {total_r:.1f}")
     else:
-        st.warning(f"⏱ **Time limit reached.**  Items left: {info['items_left']}  |  Total reward: {total_r:.1f}")
+        st.warning(f"**Time's out!**  Items left: {info['items_left']}  |  Total reward: {total_r:.1f}")
 
     return total_r, info
 

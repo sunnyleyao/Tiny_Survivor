@@ -3,13 +3,19 @@ import matplotlib.pyplot as plt
 import pickle
 import torch
 import os
+import sys
+
+ROOT  = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA  = os.path.join(ROOT, "data")
+MODEL = os.path.join(ROOT, "models")
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from hamster_env import HamsterEnv
 from q_learning import evaluate as ql_evaluate, get_state, get_q_values, MAX_STEPS
 from dqn import evaluate as dqn_evaluate, QNetwork, load_model, device
 
 
-# ── helper: smooth a noisy reward curve for plotting ─────────────────────────
+# smooth a noisy reward curve for plotting 
 def smooth(values, window=500):
     """Running average over a window -- makes the learning curve readable."""
     smoothed = []
@@ -29,15 +35,15 @@ def plot_learning_curves():
     fig.suptitle("Learning Curves: Q-Learning vs DQN", fontsize=14)
 
     configs = [
-        ("ql_logs_sparse.npy",  "Q-Learning (sparse)",  "blue",   0),
-        ("ql_logs_shaped.npy",  "Q-Learning (shaped)",  "cornflowerblue", 0),
-        ("dqn_logs_sparse.npy", "DQN (sparse)",         "red",    1),
-        ("dqn_logs_shaped.npy", "DQN (shaped)",         "salmon", 1),
+        (os.path.join(DATA, "ql_logs_sparse.npy"),  "Q-Learning (sparse)",  "blue",   0),
+        (os.path.join(DATA, "ql_logs_shaped.npy"),  "Q-Learning (shaped)",  "cornflowerblue", 0),
+        (os.path.join(DATA, "dqn_logs_sparse.npy"), "DQN (sparse)",         "red",    1),
+        (os.path.join(DATA, "dqn_logs_shaped.npy"), "DQN (shaped)",         "salmon", 1),
     ]
 
     for fname, label, color, ax_idx in configs:
         if not os.path.exists(fname):
-            print(f"  Missing {fname} -- run q_learning.py and dqn.py first")
+            print(f"  Missing {fname}")
             continue
         logs = np.load(fname, allow_pickle=True).item()
         smoothed = smooth(logs["reward"], window=500)
@@ -71,10 +77,10 @@ def plot_win_rates():
     fig.suptitle("Win Rate Over Training", fontsize=14)
 
     configs = [
-        ("ql_logs_sparse.npy",  "Q-Learning (sparse)",  "blue",   0),
-        ("ql_logs_shaped.npy",  "Q-Learning (shaped)",  "cornflowerblue", 0),
-        ("dqn_logs_sparse.npy", "DQN (sparse)",         "red",    1),
-        ("dqn_logs_shaped.npy", "DQN (shaped)",         "salmon", 1),
+        (os.path.join(DATA, "ql_logs_sparse.npy"),  "Q-Learning (sparse)",  "blue",   0),
+        (os.path.join(DATA, "ql_logs_shaped.npy"),  "Q-Learning (shaped)",  "cornflowerblue", 0),
+        (os.path.join(DATA, "dqn_logs_sparse.npy"), "DQN (sparse)",         "red",    1),
+        (os.path.join(DATA, "dqn_logs_shaped.npy"), "DQN (shaped)",         "salmon", 1),
     ]
 
     for fname, label, color, ax_idx in configs:
@@ -106,7 +112,7 @@ def run_ablation():
 
     # Q-Learning variants
     for variant in ["sparse", "shaped"]:
-        fname = f"q_table_{variant}.pkl"
+        fname = os.path.join(MODEL, f"q_table_{variant}.pkl")
         if not os.path.exists(fname):
             print(f"  Missing {fname}, skipping...")
             continue
@@ -118,7 +124,7 @@ def run_ablation():
 
     # DQN variants
     for variant in ["sparse", "shaped"]:
-        fname = f"dqn_{variant}.pth"
+        fname = os.path.join(MODEL, f"dqn_{variant}.pth")
         if not os.path.exists(fname):
             print(f"  Missing {fname}, skipping...")
             continue
@@ -171,7 +177,7 @@ def plot_loss_curve():
     ax.set_title("DQN Training Loss")
 
     for variant, color in [("sparse", "red"), ("shaped", "salmon")]:
-        fname = f"dqn_logs_{variant}.npy"
+        fname = os.path.join(DATA, f"dqn_logs_{variant}.npy")
         if not os.path.exists(fname):
             continue
         logs     = np.load(fname, allow_pickle=True).item()
@@ -188,76 +194,8 @@ def plot_loss_curve():
     print("Saved dqn_loss.png")
 
 
-def print_qualitative_summary(results):
-    """
-    Write out a brief qualitative summary alongside the numbers (5 pts).
-    I'll copy this into my README evaluation section.
-    """
-    if not results:
-        return
-
-    print("\n")
-    print("=" * 65)
-    print("QUALITATIVE SUMMARY")
-    print("=" * 65)
-
-    ql_sparse  = results.get("QL_sparse",  {})
-    ql_shaped  = results.get("QL_shaped",  {})
-    dqn_sparse = results.get("DQN_sparse", {})
-    dqn_shaped = results.get("DQN_shaped", {})
-
-    # compare algorithms
-    if ql_sparse and dqn_sparse:
-        ql_wr  = ql_sparse.get("win_rate_%", 0)
-        dqn_wr = dqn_sparse.get("win_rate_%", 0)
-        better = "DQN" if dqn_wr > ql_wr else "Q-Learning"
-        diff   = abs(dqn_wr - ql_wr)
-        print(f"\nAlgorithm comparison (sparse reward):")
-        print(f"  {better} achieves a higher win rate by {diff:.1f} percentage points.")
-        if diff < 5:
-            print("  The gap is small, which makes sense -- 5x5 is simple enough")
-            print("  for tabular Q-learning to handle well.")
-        else:
-            print("  DQN's neural network generalizes better across unseen states.")
-
-    # compare reward shaping
-    if ql_sparse and ql_shaped:
-        diff = ql_shaped.get("win_rate_%", 0) - ql_sparse.get("win_rate_%", 0)
-        print(f"\nReward shaping effect on Q-Learning: {diff:+.1f}% win rate")
-        print("  Shaped reward adds a small bonus for moving toward seeds/magic.")
-        if diff > 0:
-            print("  This helps the agent explore more efficiently early in training.")
-        else:
-            print("  Surprisingly, shaping didn't help much -- the sparse reward")
-            print("  signal was clear enough on this small map.")
-
-    if dqn_sparse and dqn_shaped:
-        diff = dqn_shaped.get("win_rate_%", 0) - dqn_sparse.get("win_rate_%", 0)
-        print(f"\nReward shaping effect on DQN: {diff:+.1f}% win rate")
-
-    print("\n(Full discussion in README.md Evaluation section)")
-    print("=" * 65)
-
-
-# main 
 if __name__ == "__main__":
-    print("=== Plotting learning curves ===")
     plot_learning_curves()
-
-    print("\n=== Plotting win rates ===")
     plot_win_rates()
-
-    print("\n=== Plotting DQN loss ===")
     plot_loss_curve()
-
-    print("\n=== Running ablation study ===")
     results = run_ablation()
-
-    print("\n=== Qualitative summary ===")
-    print_qualitative_summary(results)
-
-    print("\nAll done! Generated files:")
-    print("  learning_curves.png")
-    print("  win_rates.png")
-    print("  dqn_loss.png")
-    print("  ablation_results.npy")

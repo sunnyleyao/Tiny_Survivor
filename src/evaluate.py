@@ -43,13 +43,13 @@ def run_episode(agent_type, model_or_table, shaped=False, seed=None):
 
 
 def behavioral_analysis(agent_type, model_or_table):
-    print(f"\n── Behavioral Analysis ({agent_type.upper()}) ──────────────────")
+    print(f"\n Behavioral Analysis ({agent_type.upper()})")
 
     ACTION_NAMES = ["up", "down", "left", "right"]
 
-    # scenario 1:trap right next to a seed
-    print("\n  Scenario 1: Seed at (0,1), Trap at (0,2), hamster at (0,0)")
-    print("Question: does the agent go for the seed even with a trap nearby?")
+    # scenario 1: trap right next to a seed
+    # Seed at (0,1), Trap at (0,2), hamster at (0,0)")
+    # Question: does the agent go for the seed even with a trap nearby?
 
     env = HamsterEnv(grid_size=5)
     env.reset(seed=0)
@@ -65,37 +65,37 @@ def behavioral_analysis(agent_type, model_or_table):
     action = _get_action(agent_type, model_or_table, obs)
     print(f"  Agent chose: {ACTION_NAMES[action]}", end="  -->  ")
     if action == 3:   # right = toward seed
-        print("✓ Goes for the seed (good)")
+        print("Goes for the seed")
     elif action == 1:
-        print("↓ Goes down (avoiding the row entirely)")
+        print("Goes down (avoiding the row entirely)")
     else:
-        print(f"? Chose {ACTION_NAMES[action]} (cautious or confused)")
+        print(f"Chose {ACTION_NAMES[action]} (cautious or confused)")
     env.close()
 
     # scenario 2: one item left, far corner
-    print("\n  Scenario 2: Only magic left at (4,4), hamster at (0,0)")
-    print("  Question: does it head toward the goal?")
+    # Scenario 2: Only magic left at (4,4), hamster at (0,0)"
+    # Question: does it head toward the goal?
 
     env = HamsterEnv(grid_size=5)
     env.reset(seed=0)
     env.grid[:] = EMPTY
     env.grid[4, 4] = MAGIC
     env.hamster_pos = (0, 0)
-    env.score       = 20
-    env.items_left  = 1
+    env.score = 20
+    env.items_left = 1
 
     obs    = env._get_obs()
     action = _get_action(agent_type, model_or_table, obs)
-    print(f"  Agent chose: {ACTION_NAMES[action]}", end="  -->  ")
+    print(f"Agent chose: {ACTION_NAMES[action]}", end="  -->  ")
     if action in (1, 3):   # down or right = toward (4,4)
-        print("✓ Moving toward the goal")
+        print("Moving toward the goal")
     else:
-        print(f"? Chose {ACTION_NAMES[action]} (moving away from goal)")
+        print(f"Chose {ACTION_NAMES[action]} (moving away from goal)")
     env.close()
 
     # scenario 3: very low score, trap nearby
-    print("\n  Scenario 3: Score=3, trap at (0,1), seed at (1,0), hamster at (0,0)")
-    print("  Question: does low score make it more conservative?")
+    # Score=3, trap at (0,1), seed at (1,0), hamster at (0,0)")
+    # Question: does low score make it more conservative?
 
     env = HamsterEnv(grid_size=5)
     env.reset(seed=0)
@@ -103,16 +103,16 @@ def behavioral_analysis(agent_type, model_or_table):
     env.grid[0, 1] = TAPE
     env.grid[1, 0] = SEED
     env.hamster_pos = (0, 0)
-    env.score       = 3    # one more trap = game over
-    env.items_left  = 1
+    env.score = 3    # one more trap = game over
+    env.items_left = 1
 
     obs    = env._get_obs()
     action = _get_action(agent_type, model_or_table, obs)
     print(f"  Agent chose: {ACTION_NAMES[action]}", end="  -->  ")
     if action == 1:   # down = toward seed, away from trap
-        print("✓ Goes for seed safely (avoids trap)")
+        print("Goes for seed safely (avoids trap)")
     elif action == 3:
-        print("✗ Walks into the trap (risky with score=3!)")
+        print("Walks into the trap")
     else:
         print(f"? Chose {ACTION_NAMES[action]}")
     env.close()
@@ -132,13 +132,13 @@ def _get_action(agent_type, model_or_table, obs):
 
 def simulation_eval(agent_type, model_or_table, n_episodes=300):
     
-    print(f"\n── Simulation Eval ({agent_type.upper()}, {n_episodes} episodes) ──────")
+    print(f"\n Simulation Eval ({agent_type.upper()}, {n_episodes} episodes)")
 
     all_rewards = []
     all_items = []
-    all_traps_hit    = []
-    all_steps        = []
-    all_wins         = []
+    all_traps_hit = []
+    all_steps = []
+    all_wins = []
 
     for ep in range(n_episodes):
         env = HamsterEnv(grid_size=5)
@@ -199,37 +199,10 @@ def simulation_eval(agent_type, model_or_table, n_episodes=300):
     return {
         "avg_reward": round(np.mean(all_rewards), 2),
         "win_rate": round(np.mean(all_wins) * 100, 1),
-        "avg_items":     round(np.mean(all_items), 2),
+        "avg_items": round(np.mean(all_items), 2),
         "avg_traps_hit": round(np.mean(all_traps_hit), 2),
-        "avg_steps":     round(np.mean(all_steps), 1),
+        "avg_steps": round(np.mean(all_steps), 1),
     }
 
-# main
-if __name__ == "__main__":
-    obs_dim = HamsterEnv().observation_space.shape[0]
 
-
-    ql_path = "q_table_sparse.pkl"
-    dqn_path = "dqn_sparse.pth"
-
-    if not os.path.exists(ql_path) or not os.path.exists(dqn_path):
-        print("Please run q_learning.py and dqn.py first to generate trained models.")
-        exit()
-
-    with open(ql_path, "rb") as f:
-        q_table = pickle.load(f)
-    dqn_model = load_model(dqn_path, obs_dim)
-
-    # run all analyses
-    print("\n FAILURE CASE ANALYSIS")
-    failure_case_analysis("ql",  q_table)
-    failure_case_analysis("dqn", dqn_model)
-
-    print("\n BEHAVIORAL ANALYSIS ")
-    behavioral_analysis("ql",  q_table)
-    behavioral_analysis("dqn", dqn_model)
-
-    print("\n SIMULATION EVALUATION")
-    simulation_eval("ql",  q_table)
-    simulation_eval("dqn", dqn_model)
 
