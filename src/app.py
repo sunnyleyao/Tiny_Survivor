@@ -23,9 +23,12 @@ import time
 import os
 import base64
 
-from hamster_env import HamsterEnv, EMPTY, SEED, MAGIC, TAPE, STACK
-from q_learning import get_state, get_q_values, MAX_STEPS
-from dqn import QNetwork, load_model, device
+import sys, os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+from src.hamster_env import HamsterEnv, EMPTY, SEED, MAGIC, TAPE, STACK
+from src.q_learning import get_state, get_q_values, MAX_STEPS
+from src.dqn import QNetwork, load_model, device
 
 # ── page config 
 st.set_page_config(
