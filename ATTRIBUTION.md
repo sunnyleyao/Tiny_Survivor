@@ -1,5 +1,3 @@
-# ATTRIBUTION.md
-
 ## AI Tool Usage
 
 ## `hamster_env.py`
