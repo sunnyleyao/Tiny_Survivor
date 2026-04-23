@@ -22,14 +22,18 @@ This covers:
 """
 
 import numpy as np
-import torch
-import torch.nn as nn
-import torch.optim as optim
+try:
+    import torch
+    import torch.nn as nn
+    import torch.optim as optim
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
 from collections import deque
 import random
 from hamster_env import HamsterEnv
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu") if TORCH_AVAILABLE else None
 
 EPISODES      = 50000
 LR            = 5e-4    # lower LR = more stable training
@@ -288,6 +292,8 @@ def evaluate(model, shaped_reward=False, n_episodes=500):
 
 def load_model(path, obs_dim):
     """Helper to reload a saved model."""
+    if not TORCH_AVAILABLE:
+        return None
     model = QNetwork(obs_dim).to(device)
     model.load_state_dict(torch.load(path, map_location=device))
     model.eval()
