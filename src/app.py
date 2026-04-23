@@ -32,14 +32,12 @@ from q_learning import get_state, get_q_values, MAX_STEPS
 from dqn import QNetwork, load_model, device
 
 
-# ── page config 
 st.set_page_config(
     page_title="🐹 Tiny Survivor",
     page_icon="🐹",
     layout="centered",
 )
 
-# ── global styles ─────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
   /* warm parchment background */
@@ -212,22 +210,6 @@ def draw_grid(grid, hamster_pos):
     return html
 
 
-# ── legend ────────────────────────────────────────────────────────────────────
-def show_legend():
-    st.markdown("""
-<div class="legend-card">
-<b>Legend</b><br>
-🐹 <b>Toto</b> &nbsp;|&nbsp;
-🌱 <b>Seed</b> +5 &nbsp;|&nbsp;
-✨ <b>Magic</b> +10 &nbsp;|&nbsp;
-📼 <b>Tape</b> −5 &nbsp;|&nbsp;
-🪨 <b>Stack</b> −5 &nbsp;|&nbsp;
-⬜ Empty
-</div>
-""", unsafe_allow_html=True)
-
-
-# ── episode runner
 def run_episode(agent_type, model_or_table, shaped, seed, delay):
     env = HamsterEnv(grid_size=5, shaped_reward=shaped)
     obs, info = env.reset(seed=int(seed))
@@ -296,7 +278,7 @@ def run_episode(agent_type, model_or_table, shaped, seed, delay):
     return total_r, info
 
 
-# ── main UI
+# main UI
 variant = reward_choice.lower()
 
 if run_button:
@@ -330,4 +312,4 @@ else:
     )
     env.close()
 
-    show_legend()
+

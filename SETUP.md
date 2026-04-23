@@ -18,7 +18,7 @@ pip install -r requirements.txt
 3. Trained models are already included in the repository. Then you can directly run the functional web application.
 
 ```bash
-streamlit run app.py
+streamlit run src/app.py
 ```
 
 This will open the app locally. You can select an agent (Q-Learning or DQN), choose a reward type (Sparse or Shaped), and press  **Run Episode** to watch the hamster play.
