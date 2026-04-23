@@ -1,0 +1,7 @@
+cd /Users/sunny/Desktop/rl\ game
+cat > requirements.txt << EOF
+streamlit
+numpy
+gymnasium
+matplotlib
+torch
