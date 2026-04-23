@@ -1,5 +1,6 @@
 # CS372 Final Project
-**Name:** Sunny Sun\\
+**Name:** Sunny Sun
+
 **netid:** ls607
 
 ## What is this project about
