@@ -24,7 +24,7 @@ And when you enter the game, select an agent and reward type in the sidebar, the
 ## Evaluation
 ### Quantitative Results
 
-All agents were evaluated over 500 greedy episodes (no exploration) after training.
+All agents were evaluated over 500 greedy episodes (no exploration) after training in the ablation study.
 
 | | Sparse Reward | Shaped Reward |
 |---|---|---|
