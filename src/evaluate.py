@@ -15,7 +15,7 @@ def run_episode(agent_type, model_or_table, shaped=False, seed=None):
     trajectory = []
 
     for _ in range(MAX_STEPS):
-        state_snapshot = env.get_state()   # save the full grid state
+        state_snapshot = env.get_state() 
 
         if agent_type == "ql":
             s     = get_state(obs)
@@ -39,9 +39,6 @@ def run_episode(agent_type, model_or_table, shaped=False, seed=None):
     env.close()
     return trajectory, info
 
-
-
-
 def behavioral_analysis(agent_type, model_or_table):
     print(f"\n Behavioral Analysis ({agent_type.upper()})")
 
@@ -49,7 +46,7 @@ def behavioral_analysis(agent_type, model_or_table):
 
     # scenario 1: trap right next to a seed
     # Seed at (0,1), Trap at (0,2), hamster at (0,0)")
-    # Question: does the agent go for the seed even with a trap nearby?
+    # does the agent go for the seed even with a trap nearby?
 
     env = HamsterEnv(grid_size=5)
     env.reset(seed=0)
@@ -73,8 +70,8 @@ def behavioral_analysis(agent_type, model_or_table):
     env.close()
 
     # scenario 2: one item left, far corner
-    # Scenario 2: Only magic left at (4,4), hamster at (0,0)"
-    # Question: does it head toward the goal?
+    # Only Helsius left at (4,4), hamster at (0,0)
+    # does it head toward the goal?
 
     env = HamsterEnv(grid_size=5)
     env.reset(seed=0)
@@ -95,7 +92,7 @@ def behavioral_analysis(agent_type, model_or_table):
 
     # scenario 3: very low score, trap nearby
     # Score=3, trap at (0,1), seed at (1,0), hamster at (0,0)")
-    # Question: does low score make it more conservative?
+    # does low score make it more conservative?
 
     env = HamsterEnv(grid_size=5)
     env.reset(seed=0)
@@ -155,7 +152,7 @@ def simulation_eval(agent_type, model_or_table, n_episodes=300):
 
             if reward >= 5:    # picked up seed or magic
                 items_got += 1
-            if reward <= -5:   # hit a trap (tape or stack)
+            if reward <= -5:   # hit a trap 
                 traps_hit += 1
 
             if done or truncated:
@@ -174,7 +171,6 @@ def simulation_eval(agent_type, model_or_table, n_episodes=300):
     print(f"  avg traps hit:   {np.mean(all_traps_hit):.2f}")
     print(f"  avg steps:       {np.mean(all_steps):.1f}")
 
-    # plot items collected distribution
     fig, axes = plt.subplots(1, 2, figsize=(10, 4))
     fig.suptitle(f"{agent_type.upper()} -- Simulation Results ({n_episodes} eps)")
 
@@ -194,7 +190,6 @@ def simulation_eval(agent_type, model_or_table, n_episodes=300):
     fname = f"simulation_{agent_type}.png"
     plt.savefig(fname, dpi=150)
     plt.close()
-    print(f"  Saved {fname}")
 
     return {
         "avg_reward": round(np.mean(all_rewards), 2),

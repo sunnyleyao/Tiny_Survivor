@@ -1,29 +1,26 @@
-
-
 import numpy as np
 import pickle
 from hamster_env import HamsterEnv
 
 EPISODES  = 50000
-LR        = 0.5     # higher LR for faster convergence
-GAMMA     = 0.95
+LR = 0.5 
+GAMMA = 0.95
 EPS_START = 1.0
-EPS_END   = 0.05
+EPS_END = 0.05
 EPS_DECAY = 0.9998
 MAX_STEPS = 200
 
 def get_state(obs, grid_size=5):
     n = grid_size * grid_size
-
     row = int(round(obs[0] * (grid_size - 1)))
     col = int(round(obs[1] * (grid_size - 1)))
 
-    seed_map  = obs[2 : 2 + n].reshape(grid_size, grid_size)
-    magic_map = obs[2 + n: 2 + 2*n].reshape(grid_size, grid_size)
+    seed_map  = obs[2 : 2+ n].reshape(grid_size, grid_size)
+    magic_map = obs[2 + n:2 + 2*n].reshape(grid_size, grid_size)
     trap_map  = obs[2 + 2*n: 2 + 3*n].reshape(grid_size, grid_size)
 
     def nearest_dir(item_map, cur_r, cur_c):
-        """Return direction to nearest item as a simple code."""
+        """Return direction to nearest item"""
         best_d = float("inf")
         best_r, best_c = -1, -1
         for r in range(grid_size):
@@ -38,11 +35,10 @@ def get_state(obs, grid_size=5):
         dr = best_r - cur_r
         dc = best_c - cur_c
         if abs(dr) >= abs(dc):
-            return 0 if dr > 0 else 1   # down or up
+            return 0 if dr > 0 else 1   
         else:
-            return 2 if dc > 0 else 3   # right or left
+            return 2 if dc > 0 else 3 
 
-    # combine seed and magic maps for nearest goal
     goal_map = np.clip(seed_map + magic_map, 0, 1)
     goal_dir = nearest_dir(goal_map, row, col)
     trap_dir = nearest_dir(trap_map, row, col)
@@ -59,7 +55,7 @@ def train(shaped_reward=False, seed=42):
     env = HamsterEnv(grid_size=5, shaped_reward=shaped_reward, max_steps=MAX_STEPS)
 
     q_table = {}  
-    eps     = EPS_START
+    eps = EPS_START
 
     all_rewards = []
     all_steps   = []
@@ -67,9 +63,9 @@ def train(shaped_reward=False, seed=42):
 
     for ep in range(EPISODES):
         obs, info = env.reset()
-        state     = get_state(obs)
-        total_r   = 0.0
-        won       = False
+        state = get_state(obs)
+        total_r = 0.0
+        won = False
 
         for _ in range(MAX_STEPS):
             if np.random.random() < eps:
@@ -84,7 +80,7 @@ def train(shaped_reward=False, seed=42):
             q_next = get_q_values(q_table, next_state)
             q_now[action] += LR * (reward + GAMMA * np.max(q_next) - q_now[action])
 
-            state    = next_state
+            state = next_state
             total_r += reward
 
             if done or truncated:
@@ -100,7 +96,7 @@ def train(shaped_reward=False, seed=42):
         if (ep + 1) % 5000 == 0:
             recent_reward   = np.mean(all_rewards[-500:])
             recent_win_rate = np.mean(all_wins[-500:]) * 100
-            print(f"  ep {ep+1:>6} | avg reward: {recent_reward:>7.2f} | win rate: {recent_win_rate:.1f}% | eps: {eps:.3f}")
+            print(f"ep {ep+1:>6} | avg reward: {recent_reward:>7.2f} | win rate: {recent_win_rate:.1f}% | eps: {eps:.3f}")
 
     env.close()
 
@@ -162,10 +158,7 @@ def evaluate(q_table, shaped_reward=False, n_episodes=500):
 
 # main
 if __name__ == "__main__":
-    print("Training Q-Learning (sparse reward) ...")
     q_table, logs = train(shaped_reward=False)
     evaluate(q_table)
-
-    print("\nTraining Q-Learning (shaped reward) ...")
     q_table_shaped, logs_shaped = train(shaped_reward=True)
     evaluate(q_table_shaped, shaped_reward=True)

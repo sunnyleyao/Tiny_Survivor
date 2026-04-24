@@ -62,7 +62,6 @@ class HamsterEnv(gym.Env):
                 return r, c
 
     def _place_items(self):
-        """Randomly scatter items on the grid for this episode."""
         n_seeds  = 3
         n_magic  = 1
         n_tape   = 1
@@ -132,7 +131,6 @@ class HamsterEnv(gym.Env):
         }
 
     def _nearest_goal_dist(self):
-        """Manhattan distance to nearest uncollected seed or magic."""
         r, c  = self.hamster_pos
         min_d = float("inf")
         for row in range(self.grid_size):
@@ -141,7 +139,7 @@ class HamsterEnv(gym.Env):
                     min_d = min(min_d, abs(r - row) + abs(c - col))
         return min_d if min_d != float("inf") else 0
 
-    # Gymnasium API
+    # Gymnasium 
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
 
@@ -158,7 +156,7 @@ class HamsterEnv(gym.Env):
         r, c = self.hamster_pos
         g = self.grid_size
 
-        # movement (wall blocking — stay in place if out of bounds)
+        # movement 
         dr, dc = [(-1, 0), (1, 0), (0, -1), (0, 1)][action]
         nr, nc = r + dr, c + dc
         if 0 <= nr < g and 0 <= nc < g:
@@ -167,7 +165,7 @@ class HamsterEnv(gym.Env):
         # step penalty
         self.steps += 1
         self.score -= 1
-        reward      = -1.0
+        reward = -1.0
 
         # item interaction
         cell = self.grid[self.hamster_pos]
@@ -181,7 +179,7 @@ class HamsterEnv(gym.Env):
 
         # shaped reward (ablation variant)
         if self.shaped_reward and self.items_left > 0:
-            d      = self._nearest_goal_dist()
+            d = self._nearest_goal_dist()
             reward += 0.5 / (d + 1)
 
         # termination
@@ -190,8 +188,6 @@ class HamsterEnv(gym.Env):
         done = win or lose
         truncated = self.steps >= self.max_steps
 
-        if win:
-            reward += 10.0   # win bonus
 
         info = self._get_info()
         info["win"]  = win
@@ -200,9 +196,7 @@ class HamsterEnv(gym.Env):
         return self._get_obs(), reward, done, truncated, info
 
     # render for debug
-
     def render(self):
-        """Print ASCII map to terminal. Call manually when debugging."""
         g   = self.grid_size
         sep = "+" + ("---+" * g)
         print(sep)
@@ -218,10 +212,6 @@ class HamsterEnv(gym.Env):
         print(f"Score: {self.score}  |  Steps: {self.steps}  |  Items left: {self.items_left}\n")
 
     def get_state(self):
-        """
-        Return a human-readable dict of the current state.
-        Useful for debugging and building your own custom visualizations.
-        """
         return {
             "grid": self.grid.copy(),
             "hamster_pos": self.hamster_pos,

@@ -79,7 +79,7 @@ st.markdown("""
 *Help me! I'm **Toto**, and I'm stuck in this box.*
 Watch me explore, collect seeds and Helsius Energy Drink, and dodge the cat's paw and the bin. **Cheer for me!**
 
-**Win condition:** collect all seeds & magic before score hits 0.
+**Win condition:** collect all seeds & Helsius Energy Drink before score hits 0.
 """)
 st.divider()
 
@@ -214,10 +214,10 @@ def run_episode(agent_type, model_or_table, shaped, seed, delay):
 
     for step in range(MAX_STEPS):
         if agent_type == "ql":
-            s      = get_state(obs)
+            s = get_state(obs)
             action = int(np.argmax(get_q_values(model_or_table, s)))
         else:
-            s_t    = torch.FloatTensor(obs).unsqueeze(0).to(device)
+            s_t = torch.FloatTensor(obs).unsqueeze(0).to(device)
             with torch.no_grad():
                 action = int(model_or_table(s_t).argmax().item())
 

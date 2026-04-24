@@ -17,7 +17,6 @@ from dqn import evaluate as dqn_evaluate, QNetwork, load_model, device
 
 # smooth a noisy reward curve for plotting 
 def smooth(values, window=500):
-    """Running average over a window -- makes the learning curve readable."""
     smoothed = []
     for i in range(len(values)):
         start = max(0, i - window)
@@ -26,11 +25,6 @@ def smooth(values, window=500):
 
 
 def plot_learning_curves():
-    """
-    Load all 4 training logs and plot reward over episodes.
-    This shows convergence (3 pts) and lets me visually compare
-    how fast each method learns.
-    """
     fig, axes = plt.subplots(1, 2, figsize=(14, 5))
     fig.suptitle("Learning Curves: Q-Learning vs DQN", fontsize=14)
 
@@ -64,15 +58,9 @@ def plot_learning_curves():
     plt.tight_layout()
     plt.savefig("learning_curves.png", dpi=150)
     plt.close()
-    print("Saved learning_curves.png")
 
 
-# plot win rate over training
 def plot_win_rates():
-    """
-    Win rate over time -- a more intuitive metric than raw reward.
-    Helps me see when the agent actually starts solving the task.
-    """
     fig, axes = plt.subplots(1, 2, figsize=(14, 5))
     fig.suptitle("Win Rate Over Training", fontsize=14)
 
@@ -137,10 +125,9 @@ def run_ablation():
         print("No results to show -- train the agents first.")
         return results
 
-    # print the 2x2 ablation table
     print("\n")
     print("=" * 65)
-    print("ABLATION STUDY -- 2x2 Summary Table")
+    print("ABLATION STUDY")
     print("Rows: Algorithm | Columns: Reward Function")
     print("=" * 65)
     print(f"{'':22} | {'Sparse Reward':>18} | {'Shaped Reward':>18}")
@@ -167,7 +154,6 @@ def run_ablation():
     print("=" * 65)
 
     np.save("ablation_results.npy", results)
-    print("\nSaved ablation_results.npy")
 
     return results
 
@@ -191,7 +177,7 @@ def plot_loss_curve():
     plt.tight_layout()
     plt.savefig("dqn_loss.png", dpi=150)
     plt.close()
-    print("Saved dqn_loss.png")
+
 
 
 if __name__ == "__main__":

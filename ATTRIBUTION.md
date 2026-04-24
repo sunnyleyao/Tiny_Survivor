@@ -104,10 +104,10 @@ So I spent significant time debugging this before deciding to keep the app local
 ## `analysis.ipynb`
 
 **What AI did**
-Generated the code of plotting.
+Generated the code of plotting. And help with debugging because I change the structure of directory in the middle of the project, and AI helped me solve the problem of importing.
 
 **What I did**
-I decided what each sections should be included in the analysis and what kind of plot should be used.
+I decided what each sections should be included in the analysis and what kind of plot should be used. And I wrote the analysis based on the results. I also included some takeaways I got in the overall project.
 
 ## `README.md`
 AI helped me summerize the quantitative results from several results I got from different models and evaluations.

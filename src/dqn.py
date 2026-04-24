@@ -11,15 +11,15 @@ from hamster_env import HamsterEnv
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu") if TORCH_AVAILABLE else None
 
-EPISODES      = 50000
-LR            = 5e-4    # lower LR = more stable training
-GAMMA         = 0.95
-EPS_START     = 1.0
-EPS_END       = 0.05
-EPS_DECAY     = 0.9998  # much slower decay -- agent explores for longer
-BATCH_SIZE    = 32      # smaller batch = more frequent updates
-BUFFER_SIZE   = 5000    # smaller buffer = more recent experience
-TARGET_UPDATE = 100     # update target network more frequently
+EPISODES = 50000
+LR = 5e-4    
+GAMMA = 0.95
+EPS_START = 1.0
+EPS_END = 0.05
+EPS_DECAY = 0.9998
+BATCH_SIZE = 32
+BUFFER_SIZE = 5000
+TARGET_UPDATE = 100
 MAX_STEPS     = 200
 
 
@@ -52,7 +52,7 @@ class ReplayBuffer:
         self.memory.append((state, action, reward, next_state, done))
 
     def sample(self, batch_size):
-        batch                              = random.sample(self.memory, batch_size)
+        batch = random.sample(self.memory, batch_size)
         states, actions, rewards, nexts, dones = zip(*batch)
         return (
             torch.FloatTensor(np.array(states)).to(device),
@@ -72,31 +72,30 @@ def train(shaped_reward=False, seed=42):
     np.random.seed(seed)
     torch.manual_seed(seed)
 
-    env     = HamsterEnv(grid_size=5, shaped_reward=shaped_reward, max_steps=MAX_STEPS)
+    env = HamsterEnv(grid_size=5, shaped_reward=shaped_reward, max_steps=MAX_STEPS)
     obs_dim = env.observation_space.shape[0]
 
-    # main network: the one we actually train
+    # main network
     main_net   = QNetwork(obs_dim).to(device)
 
-    # target network: a frozen copy we use to compute TD targets
-    # we only update this every TARGET_UPDATE steps to keep targets stable
+    # target network
     target_net = QNetwork(obs_dim).to(device)
     target_net.load_state_dict(main_net.state_dict())
     target_net.eval()
 
     optimizer = optim.Adam(main_net.parameters(), lr=LR)
 
-    # cosine annealing scheduler -- gradually reduces LR over training (3 pts)
+    # cosine annealing scheduler
     scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=EPISODES)
 
-    buffer     = ReplayBuffer(BUFFER_SIZE)
-    eps        = EPS_START
+    buffer = ReplayBuffer(BUFFER_SIZE)
+    eps = EPS_START
     step_count = 0
 
     all_rewards = []
-    all_steps   = []
-    all_wins    = []
-    all_losses  = []
+    all_steps = []
+    all_wins = []
+    all_losses = []
 
     for ep in range(EPISODES):
         obs, info = env.reset()
@@ -106,8 +105,6 @@ def train(shaped_reward=False, seed=42):
         ep_losses = []
 
         for _ in range(MAX_STEPS):
-
-            # epsilon-greedy action selection
             if random.random() < eps:
                 action = env.action_space.sample()
             else:
@@ -117,36 +114,32 @@ def train(shaped_reward=False, seed=42):
 
             next_obs, reward, done, truncated, info = env.step(action)
 
-            # store this transition in the replay buffer
+            # replay buffer
             buffer.store(state, action, reward, next_obs, float(done))
             state      = next_obs.copy()
             total_r   += reward
             step_count += 1
 
-            # only start training once we have enough samples in the buffer
             if len(buffer) >= BATCH_SIZE:
                 states, actions, rewards, next_states, dones = buffer.sample(BATCH_SIZE)
 
-                # what the main network currently predicts for Q(s,a)
                 q_predicted = main_net(states).gather(1, actions.unsqueeze(1)).squeeze(1)
 
-                # what the target network says the best next Q-value is
                 with torch.no_grad():
                     q_next_max = target_net(next_states).max(1)[0]
-                    q_target   = rewards + GAMMA * q_next_max * (1 - dones)
+                    q_target = rewards + GAMMA * q_next_max * (1 - dones)
 
                 loss = nn.MSELoss()(q_predicted, q_target)
 
                 optimizer.zero_grad()
                 loss.backward()
 
-                # gradient clipping: stops gradients from getting too large (3 pts)
+                # gradient clipping
                 nn.utils.clip_grad_norm_(main_net.parameters(), max_norm=1.0)
 
                 optimizer.step()
                 ep_losses.append(loss.item())
 
-            # copy main network weights to target network periodically
             if step_count % TARGET_UPDATE == 0:
                 target_net.load_state_dict(main_net.state_dict())
 
@@ -154,8 +147,6 @@ def train(shaped_reward=False, seed=42):
                 won = info.get("win", False)
                 break
 
-        # decay epsilon and step the LR scheduler
-        # note: scheduler.step() must come after optimizer.step()
         eps = max(EPS_END, eps * EPS_DECAY)
         if len(ep_losses) > 0:
             scheduler.step()
@@ -168,7 +159,7 @@ def train(shaped_reward=False, seed=42):
         if (ep + 1) % 5000 == 0:
             recent_reward   = np.mean(all_rewards[-500:])
             recent_win_rate = np.mean(all_wins[-500:]) * 100
-            print(f"  ep {ep+1:>6} | avg reward: {recent_reward:>7.2f} | win rate: {recent_win_rate:.1f}% | eps: {eps:.3f}")
+            print(f"ep {ep+1:>6} | avg reward: {recent_reward:>7.2f} | win rate: {recent_win_rate:.1f}% | eps: {eps:.3f}")
 
     env.close()
 
@@ -181,8 +172,6 @@ def train(shaped_reward=False, seed=42):
         "wins":   all_wins,
         "loss":   all_losses,
     }
-    np.save(f"dqn_logs_{label}.npy", logs)
-    print(f"\nSaved dqn_{label}.pth and dqn_logs_{label}.npy")
 
     return main_net, logs
 
@@ -228,7 +217,6 @@ def evaluate(model, shaped_reward=False, n_episodes=500):
         "avg_inference_ms": round(float(np.mean(times)) * 1000, 4),
     }
 
-    print("\n DQN Eval")
     for k, v in results.items():
         print(f"  {k:<22}: {v}")
 
@@ -236,7 +224,6 @@ def evaluate(model, shaped_reward=False, n_episodes=500):
 
 
 def load_model(path, obs_dim):
-    """Helper to reload a saved model."""
     if not TORCH_AVAILABLE:
         return None
     model = QNetwork(obs_dim).to(device)
@@ -247,10 +234,7 @@ def load_model(path, obs_dim):
 
 # main
 if __name__ == "__main__":
-    print("Training DQN (sparse reward)")
     model, logs = train(shaped_reward=False)
     evaluate(model)
-
-    print("\nTraining DQN (shaped reward)")
     model_shaped, logs_shaped = train(shaped_reward=True)
     evaluate(model_shaped, shaped_reward=True)
