@@ -121,7 +121,7 @@ AI helped me summerize the quantitative results from several results I got from 
 | Library | Use |
 |---|---|
 | gymnasium | RL environment API | 
-| torch / PyTorch | DQN neural network | 
+| torch | DQN neural network | 
 | numpy | Array operations | 
 | matplotlib | Plotting learning curves | 
 | streamlit | Web app framework | 
