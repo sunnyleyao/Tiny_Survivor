@@ -19,7 +19,7 @@ And when you enter the game, select an agent and reward type in the sidebar, the
 ## Video Links
 [Demo Video](https://youtu.be/qS1BVyBNlTg)
 
-[Technical Walkthrough]()
+[Technical Walkthrough](https://youtu.be/3n-Yp-Eroqs)
 
 ## Evaluation
 ### Quantitative Results
