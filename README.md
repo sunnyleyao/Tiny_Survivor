@@ -47,10 +47,5 @@ All agents were evaluated over 500 greedy episodes (no exploration) after traini
 
 ---
 
-### Reward Function Design
-
-Reward values were designed to reflect item importance: magic (+10) is rarer than seeds (+5), creating a natural priority. Traps (-5) carry the same penalty as a seed reward to create a meaningful risk-reward tradeoff. The per-step cost of -1 encourages efficient navigation. The starting score of 50 was chosen after observing that a score of 20 caused agents to die before collecting any items, leaving no reward signal to learn from.
-
-
 ## Individual Contributions
 Solo project.
