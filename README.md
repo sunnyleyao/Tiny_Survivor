@@ -22,6 +22,37 @@ And when you enter the game, select an agent and reward type in the sidebar, the
 [Technical Walkthrough]()
 
 ## Evaluation
+### Quantitative Results
+
+All agents were evaluated over 500 greedy episodes (no exploration) after training.
+
+| | Sparse Reward | Shaped Reward |
+|---|---|---|
+| **Q-Learning — avg reward** | -13.52 | -4.55 |
+| **Q-Learning — win rate** | 52.2% | 58.4% |
+| **Q-Learning — avg steps** | 35.91 | 32.31 |
+| **DQN — avg reward** | -32.00 | -15.41 |
+| **DQN — win rate** | 31.8% | 44.8% |
+| **DQN — avg steps** | 45.47 | 40.68 |
+
+Inference time: Q-Learning ~0.001ms per step, DQN ~0.027ms per step.
+
+---
+
+**Q-Learning outperforms DQN on this task.** With sparse reward, Q-Learning achieves 52.2% win rate, while DQN's 31.8%. The gap narrows with shaped reward (58.4% vs 44.8%), but Q-Learning always wins. DQN is designed for more complex tasks.
+
+**Reward shaping helps both agents.** Shaped reward improved Q-Learning win rate by 6.2 percentage points and DQN by 13 points. The effect is larger for DQN, likely because the distance bonus provides clearer guidance during the unstable early training phase. But the effect is not so significance for both.
+
+**DQN's sharp epsilon decaying.** DQN's win rate peaked at only about 77% at episode 5000 then dropped sharply as epsilon decayed. The checkpoint at episode 5000 was saved as the best model.
+
+**Generalization gap in Q-Learning.** In simulation across 300 random map layouts, Q-Learning's win rate dropped to 62% compared to 94% during training. This gap is caused by local loops.
+
+---
+
+### Reward Function Design
+
+Reward values were designed to reflect item importance: magic (+10) is rarer than seeds (+5), creating a natural priority. Traps (-5) carry the same penalty as a seed reward to create a meaningful risk-reward tradeoff. The per-step cost of -1 encourages efficient navigation. The starting score of 50 was chosen after observing that a score of 20 caused agents to die before collecting any items, leaving no reward signal to learn from.
+
 
 ## Individual Contributions
 Solo project.
