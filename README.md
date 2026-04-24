@@ -26,6 +26,8 @@ And when you enter the game, select an agent and reward type in the sidebar, the
 
 All agents were evaluated over 500 greedy episodes (no exploration) after training in the ablation study.
 
+The ablation study runs 4 experiments, which are Q-Learning + Sparse, Q-Learning + Shaped, DQN + Sparse, and DQN + Shaped.
+
 | | Sparse Reward | Shaped Reward |
 |---|---|---|
 | **Q-Learning — avg reward** | -13.52 | -4.55 |
