@@ -110,7 +110,7 @@ Generated the code of plotting.
 I decided what each sections should be included in the analysis and what kind of plot should be used.
 
 ## `README.md`
-AI helped my summerize the quantitive table.
+AI helped me summerize the quantitative results from several results I got from different models and evaluations.
 
 
 
