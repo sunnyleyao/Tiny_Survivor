@@ -79,8 +79,8 @@ def plot_win_rates():
     configs = [
         (os.path.join(DATA, "ql_logs_sparse.npy"),  "Q-Learning (sparse)",  "blue",   0),
         (os.path.join(DATA, "ql_logs_shaped.npy"),  "Q-Learning (shaped)",  "cornflowerblue", 0),
-        (os.path.join(DATA, "dqn_logs_sparse.npy"), "DQN (sparse)",         "red",    1),
-        (os.path.join(DATA, "dqn_logs_shaped.npy"), "DQN (shaped)",         "salmon", 1),
+        (os.path.join(DATA, "dqn_logs_sparse.npy"), "DQN (sparse)","red", 1),
+        (os.path.join(DATA, "dqn_logs_shaped.npy"), "DQN (shaped)","salmon", 1),
     ]
 
     for fname, label, color, ax_idx in configs:

@@ -1,14 +1,4 @@
 """
-app.py
-
-This is the Streamlit web app for my Hamster RL project.
-The user can pick which trained agent to watch (Q-Learning or DQN),
-then see it play the game live on the map.
-
-This covers:
-  - Deployed model as functional web application with UI (10 pts)
-  - Real-time ML inference with interactive application (7 pts)
-
 To run:
   streamlit run src/app.py
 """
