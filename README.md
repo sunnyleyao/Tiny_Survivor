@@ -17,7 +17,7 @@ streamlit run src/app.py
 And when you enter the game, select an agent and reward type in the sidebar, then press **Run Episode**. Now you can start to explore!
 
 ## Video Links
-[Demo Video](videos/demo.mp4)
+[Demo Video]([videos/demo.mp4](https://youtu.be/qS1BVyBNlTg))
 
 [Technical Walkthrough]()
 
